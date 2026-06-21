@@ -83,6 +83,7 @@ export default function ProductDetailPage() {
       quantity
     );
     setAdded(true);
+    openCart(); // Auto-open sidebar
     setTimeout(() => setAdded(false), 2000);
   };
 
@@ -243,12 +244,12 @@ export default function ProductDetailPage() {
                 : "Sold Out"}
             </button>
 
-            <Link
-              href="/cart"
+            <button
+              onClick={openCart}
               className="inline-flex items-center justify-center rounded-full border border-foreground/30 px-10 py-4 text-xs tracking-[0.25em] uppercase hover:bg-foreground hover:text-background transition mt-4 text-center"
             >
               View Cart
-            </Link>
+            </button>
           </div>
         </div>
       </section>

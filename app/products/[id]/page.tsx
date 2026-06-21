@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Header } from "@/components/Header";
 import Link from "next/link";
+import { useCart } from "@/store/useCart";
+import { useCartSidebar } from "@/components/GlobalCartProvider";
+import type { ProductVariant } from "@/types/product";
 
 interface Variant {
   id: string;
@@ -33,6 +36,8 @@ export default function ProductDetailPage() {
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const { addItem } = useCart();
+  const { openCart } = useCartSidebar();
 
   useEffect(() => {
     if (!id) return;
@@ -48,28 +53,35 @@ export default function ProductDetailPage() {
   }, [id]);
 
   const addToCart = () => {
-    // Use existing cart store or localStorage approach
-    const cart = JSON.parse(localStorage.getItem("cozy-cart") || "[]");
-    const existing = cart.find(
-      (item: any) =>
-        item.productId === product?.id &&
-        item.variantId === selectedVariant?.id
+    if (!product || !selectedVariant) return;
+    addItem(
+      {
+        id: product.id,
+        name_en: product.nameEn,
+        name_zh: product.nameZh,
+        price_hkd: selectedVariant.priceHkd,
+        grade: "Premium" as any,
+        weight: selectedVariant.weight,
+        image_url: product.imageUrl || "",
+        description_en: product.descriptionEn || "",
+        description_zh: product.descriptionZh || "",
+        origin: "",
+        origin_zh: "",
+        preparation_tips_en: "",
+        preparation_tips_zh: "",
+        category: product.category || "",
+        category_zh: "",
+        in_stock: product.inStock,
+      },
+      {
+        id: selectedVariant.id,
+        weight: selectedVariant.weight,
+        priceHkd: selectedVariant.priceHkd,
+        platinumPriceHkd: selectedVariant.platinumPriceHkd,
+        stockQuantity: selectedVariant.stockQuantity,
+      } as ProductVariant,
+      quantity
     );
-    if (existing) {
-      existing.quantity += quantity;
-    } else {
-      cart.push({
-        productId: product?.id,
-        variantId: selectedVariant?.id || product?.id,
-        nameEn: product?.nameEn,
-        nameZh: product?.nameZh,
-        imageUrl: product?.imageUrl,
-        weight: selectedVariant?.weight || "",
-        price: selectedVariant?.priceHkd || product?.priceHkd || 0,
-        quantity,
-      });
-    }
-    localStorage.setItem("cozy-cart", JSON.stringify(cart));
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };

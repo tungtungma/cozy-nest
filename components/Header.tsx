@@ -1,36 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { User, Heart, ShoppingBag, Search, Menu, X } from "lucide-react";
+import { User, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useCart } from "@/store/useCart";
+import { useCartSidebar } from "@/components/GlobalCartProvider";
 
 export function Header() {
   const { data: session } = useSession();
-  const [cartCount, setCartCount] = useState(0);
-
-  useEffect(() => {
-    const update = () => {
-      const cart = JSON.parse(
-        localStorage.getItem("cozy-cart") || "[]"
-      ) as any[];
-      setCartCount(cart.reduce((sum: number, i: any) => sum + i.quantity, 0));
-    };
-    update();
-    window.addEventListener("storage", update);
-    return () => window.removeEventListener("storage", update);
-  }, []);
-
-  // Re-check cart on client-side navigation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const cart = JSON.parse(
-        localStorage.getItem("cozy-cart") || "[]"
-      ) as any[];
-      setCartCount(cart.reduce((sum: number, i: any) => sum + i.quantity, 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const { getTotalItems } = useCart();
+  const { openCart } = useCartSidebar();
+  const cartCount = getTotalItems();
 
   return (
     <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur">
@@ -47,9 +27,7 @@ export function Header() {
 
         {/* Center Logo */}
         <Link href="/" className="flex flex-col items-center leading-none">
-          <span className="font-serif text-3xl tracking-tight">
-            cozy nest
-          </span>
+          <span className="font-serif text-3xl tracking-tight">cozy nest</span>
           <span className="mt-1 text-[9px] tracking-[0.3em] text-muted-foreground">
             COZY NEST
           </span>
@@ -74,8 +52,8 @@ export function Header() {
             </button>
           )}
 
-          <Link
-            href="/cart"
+          <button
+            onClick={openCart}
             aria-label="Cart"
             className="relative hover:text-accent transition"
           >
@@ -85,7 +63,7 @@ export function Header() {
                 {cartCount}
               </span>
             )}
-          </Link>
+          </button>
         </div>
       </div>
     </header>

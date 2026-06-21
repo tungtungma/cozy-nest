@@ -99,7 +99,8 @@ export default function TopProductsBarChart({
             padding: "10px",
           }}
           cursor={{ fill: "rgba(15, 118, 110, 0.08)" }}
-          formatter={(_value: number | undefined, _name: string | undefined, props: any) => [
+          // @ts-expect-error Recharts formatter types are overly strict
+          formatter={(_value: any, _name: any, props: any) => [
             `${props.payload?.sold || 0} ${t.unitsSold}`,
             `${t.revenue}: HK$${props.payload?.revenue?.toLocaleString() || 0}`,
           ]}

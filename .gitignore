@@ -4,5 +4,3 @@ node_modules
 .next
 *.backup
 .next
-reference .hermes lovable
-.DS_Store

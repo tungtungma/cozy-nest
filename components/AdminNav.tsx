@@ -8,85 +8,70 @@ export default function AdminNav() {
 
   const nav = {
     en: {
-      title: "🛠️ Admin Dashboard",
-      overview: "Overview",
-      products: "📦 Products",
-      orders: "📋 Orders",
-      members: "👥 Members",
-      restock: "📊 Restock",
-      backToSite: "← Back to Site",
-      langToggle: "繁中"
+      title: "Admin",
+      overview: "Dashboard",
+      products: "Products",
+      orders: "Orders",
+      members: "Members",
+      restock: "Stock",
+      backToSite: "← Store",
+      langToggle: "繁中",
     },
     zh: {
-      title: "🛠️ 管理後台",
-      overview: "總覽",
-      products: "📦 產品管理",
-      orders: "📋 訂單管理",
-      members: "👥 會員管理",
-      restock: "📊 補貨儀表板",
-      backToSite: "← 返回網站",
-      langToggle: "EN"
-    }
+      title: "管理",
+      overview: "儀表板",
+      products: "產品",
+      orders: "訂單",
+      members: "會員",
+      restock: "庫存",
+      backToSite: "← 商店",
+      langToggle: "EN",
+    },
   };
 
   const t = nav[language];
 
   return (
-    <nav className="bg-teal text-white shadow-lg">
-      <div className="container-custom py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/admin" className="text-2xl font-playfair font-bold">
-              {t.title}
-            </Link>
-            <div className="flex gap-4 font-lora">
+    <nav className="border-b border-border bg-background sticky top-0 z-40">
+      <div className="mx-auto max-w-7xl px-8 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-8">
+          <Link
+            href="/admin"
+            className="font-serif text-xl text-foreground tracking-tight"
+          >
+            Cozy Nest <span className="text-muted-foreground text-sm">{t.title}</span>
+          </Link>
+          <div className="hidden md:flex gap-1">
+            {[
+              { href: "/admin", label: t.overview },
+              { href: "/admin/products", label: t.products },
+              { href: "/admin/orders", label: t.orders },
+              { href: "/admin/members", label: t.members },
+              { href: "/admin/restock", label: t.restock },
+            ].map((item) => (
               <Link
-                href="/admin"
-                className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                key={item.href}
+                href={item.href}
+                className="px-3 py-1.5 text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:bg-cream rounded transition-colors"
               >
-                {t.overview}
+                {item.label}
               </Link>
-              <Link
-                href="/admin/products"
-                className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                {t.products}
-              </Link>
-              <Link
-                href="/admin/orders"
-                className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                {t.orders}
-              </Link>
-              <Link
-                href="/admin/members"
-                className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                {t.members}
-              </Link>
-              <Link
-                href="/admin/restock"
-                className="px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                {t.restock}
-              </Link>
-            </div>
+            ))}
           </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={toggleLanguage}
-              className="px-5 py-2.5 text-sm font-lora font-medium text-white bg-amber rounded-xl hover:bg-amber-dark transition-all duration-200 shadow-md"
-              aria-label="Toggle language"
-            >
-              {t.langToggle}
-            </button>
-            <Link
-              href="/"
-              className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors font-lora"
-            >
-              {t.backToSite}
-            </Link>
-          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleLanguage}
+            className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-foreground transition"
+          >
+            {t.langToggle}
+          </button>
+          <Link
+            href="/"
+            className="text-xs tracking-wider text-muted-foreground hover:text-foreground transition"
+          >
+            {t.backToSite}
+          </Link>
         </div>
       </div>
     </nav>

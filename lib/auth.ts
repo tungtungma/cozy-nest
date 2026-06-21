@@ -51,6 +51,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account, profile }) {
       if (!user.email) return true;
 
+      // Auto-promote admin emails
+      const adminEmails = (process.env.ADMIN_EMAILS || "ling@tungmasoup.com").split(",").map(e => e.trim());
+      const isAdmin = adminEmails.includes(user.email);
+
       // Check if user is in the whitelist
       const allowedEmails = process.env.ALLOWED_MEMBER_EMAILS?.split(',').map(e => e.trim()) || [];
       const isWhitelisted = allowedEmails.includes(user.email);
@@ -61,15 +65,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       });
 
       if (existingUser) {
-        // If whitelisted but not yet a member, auto-approve
-        if (isWhitelisted && existingUser.role === "pending") {
+        // Promote to admin if needed
+        if (isAdmin && existingUser.role !== "admin") {
           await prisma.user.update({
             where: { email: user.email },
-            data: {
-              role: "member",
-              approvedAt: new Date(),
-              approvedBy: "auto-whitelist",
-            },
+            data: { role: "admin", approvedAt: new Date(), approvedBy: "auto-admin" },
+          });
+        }
+        // If whitelisted but not yet a member, auto-approve
+        else if (isWhitelisted && existingUser.role === "pending") {
+          await prisma.user.update({
+            where: { email: user.email },
+            data: { role: "member", approvedAt: new Date(), approvedBy: "auto-whitelist" },
           });
         }
       } else if (isWhitelisted) {
@@ -87,6 +94,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   events: {
     createUser: async ({ user }) => {
+      // Auto-admin: ling@tungmasoup.com
+      const adminEmails = (process.env.ADMIN_EMAILS || "ling@tungmasoup.com").split(",").map(e => e.trim());
+      if (user.email && adminEmails.includes(user.email)) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            role: "admin",
+            approvedAt: new Date(),
+            approvedBy: "auto-admin",
+          },
+        });
+        return;
+      }
+
       // Check whitelist for new users
       const allowedEmails = process.env.ALLOWED_MEMBER_EMAILS?.split(',').map(e => e.trim()) || [];
       if (user.email && allowedEmails.includes(user.email)) {

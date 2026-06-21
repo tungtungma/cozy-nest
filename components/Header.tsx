@@ -1,16 +1,23 @@
 "use client";
 
-import { User, ShoppingBag } from "lucide-react";
+import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/store/useCart";
 import { useCartSidebar } from "@/components/GlobalCartProvider";
+import { useMemberStatus } from "@/hooks/useMemberStatus";
 
 export function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { getTotalItems } = useCart();
   const { openCart } = useCartSidebar();
+  const { isAdmin } = useMemberStatus();
+  const [mounted, setMounted] = useState(false);
   const cartCount = getTotalItems();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   return (
     <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur">
@@ -35,13 +42,43 @@ export function Header() {
 
         {/* Right Actions */}
         <div className="flex items-center gap-6 text-foreground/70">
-          {session ? (
-            <button
-              onClick={() => signOut()}
-              className="text-[10px] tracking-wider uppercase hover:text-accent transition"
-            >
-              {session.user?.name?.split(" ")[0] || "Account"}
-            </button>
+          {mounted && session ? (
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition"
+              >
+                <User size={16} strokeWidth={1.4} />
+                {session.user?.name?.split(" ")[0] || "Account"}
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition"
+                    >
+                      <LayoutDashboard size={14} />
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { setMenuOpen(false); signOut({ callbackUrl: "/" }); }}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-xs text-red-600 hover:bg-cream transition"
+                  >
+                    <LogOut size={14} />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <button
               onClick={() => signIn("google")}
@@ -52,13 +89,9 @@ export function Header() {
             </button>
           )}
 
-          <button
-            onClick={openCart}
-            aria-label="Cart"
-            className="relative hover:text-accent transition"
-          >
+          <button onClick={openCart} aria-label="Cart" className="relative hover:text-accent transition">
             <ShoppingBag size={18} strokeWidth={1.4} />
-            {cartCount > 0 && (
+            {mounted && cartCount > 0 && (
               <span className="absolute -top-2 -right-2 w-4 h-4 bg-accent text-background text-[9px] rounded-full flex items-center justify-center font-medium">
                 {cartCount}
               </span>

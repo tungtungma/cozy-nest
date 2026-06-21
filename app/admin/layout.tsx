@@ -9,12 +9,10 @@ export default async function AdminLayout({
 }) {
   const session = await auth();
 
-  // Check if user is logged in and is admin
   if (!session?.user?.email) {
     redirect("/login");
   }
 
-  // Import prisma here to check user role
   const { prisma } = await import("@/lib/prisma");
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
@@ -26,12 +24,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Admin Navigation */}
+    <div className="min-h-screen bg-background">
       <AdminNav />
-
-      {/* Main Content */}
-      <main className="container-custom py-8">{children}</main>
+      <main className="mx-auto max-w-7xl px-8 py-10">{children}</main>
     </div>
   );
 }

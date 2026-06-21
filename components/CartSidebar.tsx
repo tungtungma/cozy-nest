@@ -187,6 +187,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   {language === "en" ? "Proceed to Checkout" : "前往結帳"}
                 </button>
               </Link>
+              <Link
+                href="/products"
+                onClick={onClose}
+                className="block w-full mt-3 text-center text-xs tracking-wider text-muted-foreground hover:text-foreground transition"
+              >
+                {language === "en" ? "Continue Shopping" : "繼續購物"}
+              </Link>
             </div>
           )}
         </div>

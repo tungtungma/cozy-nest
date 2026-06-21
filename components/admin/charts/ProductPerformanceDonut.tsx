@@ -116,7 +116,6 @@ export default function ProductPerformanceDonut({
             borderRadius: "8px",
             padding: "10px",
           }}
-          // @ts-expect-error Recharts formatter types are overly strict
           formatter={(_value: any, _name: any, props: any) => {
             const pct =
               chartData.reduce((s, d) => s + d.value, 0) > 0

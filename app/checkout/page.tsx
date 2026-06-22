@@ -28,7 +28,7 @@ export default function CheckoutPage() {
     en: {
       title: "Checkout",
       secure: "Secure Checkout",
-      delivery: "Delivery Information",
+      deliveryInfo: "Delivery Information",
       fullName: "Full Name *",
       phone: "Phone *",
       address: "Address *",
@@ -53,7 +53,7 @@ export default function CheckoutPage() {
     zh: {
       title: "結帳",
       secure: "安全結帳",
-      delivery: "送貨資料",
+      deliveryInfo: "送貨資料",
       fullName: "姓名 *",
       phone: "電話 *",
       address: "地址 *",
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12">
             <div className="lg:col-span-3 space-y-8 md:space-y-10">
               <div>
-                <h2 className="font-serif text-xl md:text-2xl mb-4 md:mb-6">{t[language].delivery}</h2>
+                <h2 className="font-serif text-xl md:text-2xl mb-4 md:mb-6">{t[language].deliveryInfo}</h2>
                 <div className="space-y-4">
                   {[
                     { label: t[language].fullName, value: fullName, set: setFullName, placeholder: "Your full name" },

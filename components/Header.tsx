@@ -15,19 +15,11 @@ export function Header() {
   const { openCart } = useCartSidebar();
   const { isAdmin } = useMemberStatus();
   const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const cartCount = getTotalItems();
   const { language, toggleLanguage } = useLanguage();
 
   useEffect(() => { setMounted(true); }, []);
-
-  const handleSignOut = () => {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/api/auth/signout';
-    form.innerHTML = '<input type="hidden" name="callbackUrl" value="/" />';
-    document.body.appendChild(form);
-    form.submit();
-  };
 
   const nav = {
     en: { cosmetics: "Cosmetics", about: "About" },
@@ -35,7 +27,7 @@ export function Header() {
   };
 
   return (
-    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur relative z-50">
+    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur relative" style={{ zIndex: 9999 }}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-8 py-4 md:py-6">
         <nav className="hidden sm:flex items-center gap-6 md:gap-10 text-[10px] md:text-xs tracking-[0.22em] uppercase text-foreground/80">
           <Link href="/products" className="hover:text-accent transition">{nav[language].cosmetics}</Link>
@@ -56,45 +48,71 @@ export function Header() {
           </button>
 
           {mounted && session ? (
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="user-menu-toggle"
-                className="peer hidden"
-              />
-              <label
-                htmlFor="user-menu-toggle"
-                className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition cursor-pointer"
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition"
+                style={{ position: 'relative', zIndex: 10000 }}
               >
                 <User size={16} strokeWidth={1.4} />
                 <span className="hidden sm:inline">{session.user?.name?.split(" ")[0] || "Account"}</span>
-              </label>
+              </button>
 
-              {/* Dropdown — only visible when checkbox is :checked */}
-              <div className="absolute right-0 top-full mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50 hidden peer-checked:block">
-                <div className="px-4 py-3 border-b border-border">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {session.user?.email}
-                  </p>
-                </div>
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition block"
-                  >
-                    <LayoutDashboard size={14} />
-                    Admin
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-xs text-muted-foreground hover:text-red-600 hover:bg-cream transition text-left"
+              {menuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '100%',
+                    marginTop: '8px',
+                    width: '224px',
+                    background: '#FAF7F2',
+                    border: '1px solid #E5E0D8',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                    zIndex: 99999,
+                    padding: '8px 0',
+                  }}
                 >
-                  <LogOut size={14} />
-                  {language === "en" ? "Sign Out" : "登出"}
-                </button>
-              </div>
+                  <div style={{ padding: '8px 16px', borderBottom: '1px solid #E5E0D8' }}>
+                    <p style={{ fontSize: '14px', color: '#1a1a1a' }}>
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  {isAdmin && (
+                    <a
+                      href="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '12px', color: '#1a1a1a', textDecoration: 'none' }}
+                    >
+                      <LayoutDashboard size={14} />
+                      Admin
+                    </a>
+                  )}
+                  <form action="/api/auth/signout" method="POST">
+                    <input type="hidden" name="callbackUrl" value="/" />
+                    <button
+                      type="submit"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        padding: '8px 16px',
+                        fontSize: '12px',
+                        color: '#666',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <LogOut size={14} />
+                      {language === "en" ? "Sign Out" : "登出"}
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           ) : (
             <button onClick={() => signIn("google")} aria-label="Sign in" className="hover:text-accent transition">

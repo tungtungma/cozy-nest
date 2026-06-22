@@ -20,8 +20,7 @@ export function Header() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const handleSignOut = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleSignOut = () => {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/api/auth/signout';
@@ -36,7 +35,7 @@ export function Header() {
   };
 
   return (
-    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur">
+    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur relative z-50">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-8 py-4 md:py-6">
         <nav className="hidden sm:flex items-center gap-6 md:gap-10 text-[10px] md:text-xs tracking-[0.22em] uppercase text-foreground/80">
           <Link href="/products" className="hover:text-accent transition">{nav[language].cosmetics}</Link>
@@ -57,13 +56,22 @@ export function Header() {
           </button>
 
           {mounted && session ? (
-            <details className="relative group">
-              <summary className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition cursor-pointer list-none marker:content-none">
+            <div className="relative">
+              <input
+                type="checkbox"
+                id="user-menu-toggle"
+                className="peer hidden"
+              />
+              <label
+                htmlFor="user-menu-toggle"
+                className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition cursor-pointer"
+              >
                 <User size={16} strokeWidth={1.4} />
                 <span className="hidden sm:inline">{session.user?.name?.split(" ")[0] || "Account"}</span>
-              </summary>
+              </label>
 
-              <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
+              {/* Dropdown — only visible when checkbox is :checked */}
+              <div className="absolute right-0 top-full mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50 hidden peer-checked:block">
                 <div className="px-4 py-3 border-b border-border">
                   <p className="text-sm font-medium text-foreground truncate">
                     {session.user?.email}
@@ -79,6 +87,7 @@ export function Header() {
                   </Link>
                 )}
                 <button
+                  type="button"
                   onClick={handleSignOut}
                   className="flex items-center gap-2 w-full px-4 py-2 text-xs text-muted-foreground hover:text-red-600 hover:bg-cream transition text-left"
                 >
@@ -86,7 +95,7 @@ export function Header() {
                   {language === "en" ? "Sign Out" : "登出"}
                 </button>
               </div>
-            </details>
+            </div>
           ) : (
             <button onClick={() => signIn("google")} aria-label="Sign in" className="hover:text-accent transition">
               <User size={18} strokeWidth={1.4} />

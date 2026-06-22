@@ -207,7 +207,7 @@ export default function ProductDetailPage() {
               </p>
               <div className="flex items-center border border-border rounded-full">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  onClick={() => setQuantity(Math.max(0, quantity - 1))}
                   className="px-4 py-2 text-sm hover:text-accent transition"
                 >
                   −

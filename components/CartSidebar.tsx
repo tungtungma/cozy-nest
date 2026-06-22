@@ -114,7 +114,6 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                             <button
                               onClick={() => updateQuantity(item.product.id, item.variant.id, item.quantity - 1)}
                               className="w-6 h-6 rounded-full border border-border text-muted-foreground hover:bg-foreground hover:text-background transition-all flex items-center justify-center"
-                              disabled={item.quantity <= 1}
                             >
                               <Minus className="w-3 h-3" />
                             </button>

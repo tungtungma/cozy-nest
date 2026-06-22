@@ -21,6 +21,17 @@ export function Header() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  // Close menu on click outside
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-user-menu]')) setMenuOpen(false);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [menuOpen]);
+
   const handleSignOut = () => {
     setMenuOpen(false);
     signOut({ callbackUrl: "/" });
@@ -57,7 +68,7 @@ export function Header() {
           </button>
 
           {mounted && session ? (
-            <div className="relative">
+            <div className="relative" data-user-menu>
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition"
@@ -67,25 +78,22 @@ export function Header() {
               </button>
 
               {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-20">
-                    <div className="px-4 py-3 border-b border-border">
-                      <p className="text-sm font-medium text-foreground truncate">{session.user?.email}</p>
-                    </div>
-                    {isAdmin && (
-                      <Link href="/admin" onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition">
-                        <LayoutDashboard size={14} />Admin
-                      </Link>
-                    )}
-                    <button onClick={handleSignOut}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-xs text-red-600 hover:bg-cream transition">
-                      <LogOut size={14} />
-                      {language === "en" ? "Sign Out" : "登出"}
-                    </button>
+                <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-20">
+                  <div className="px-4 py-3 border-b border-border">
+                    <p className="text-sm font-medium text-foreground truncate">{session.user?.email}</p>
                   </div>
-                </>
+                  {isAdmin && (
+                    <Link href="/admin" onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition">
+                      <LayoutDashboard size={14} />Admin
+                    </Link>
+                  )}
+                  <button onClick={handleSignOut}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-xs text-red-600 hover:bg-cream transition">
+                    <LogOut size={14} />
+                    {language === "en" ? "Sign Out" : "登出"}
+                  </button>
+                </div>
               )}
             </div>
           ) : (

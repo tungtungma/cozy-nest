@@ -143,7 +143,7 @@ export const useCart = create<CartStore>()(
       },
     }),
     {
-      name: 'heritage-ocean-cart',
+      name: 'cozy-nest-cart',
       partialize: (state) => ({
         items: state.items,
         // Don't persist userTier - fetch fresh on load

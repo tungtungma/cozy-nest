@@ -2,7 +2,7 @@
 
 import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/store/useCart";
 import { useCartSidebar } from "@/components/GlobalCartProvider";
@@ -21,13 +21,18 @@ export function Header() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  const handleSignOut = () => {
+    setMenuOpen(false);
+    signOut({ callbackUrl: "/" });
+  };
+
   const nav = {
     en: { cosmetics: "Cosmetics", about: "About" },
     zh: { cosmetics: "產品", about: "關於" },
   };
 
   return (
-    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur relative" style={{ zIndex: 9999 }}>
+    <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur sticky top-0" style={{ zIndex: 100 }}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-8 py-4 md:py-6">
         <nav className="hidden sm:flex items-center gap-6 md:gap-10 text-[10px] md:text-xs tracking-[0.22em] uppercase text-foreground/80">
           <Link href="/products" className="hover:text-accent transition">{nav[language].cosmetics}</Link>
@@ -48,70 +53,53 @@ export function Header() {
           </button>
 
           {mounted && session ? (
-            <div style={{ position: 'relative' }}>
+            <div className="relative">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
                 className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition"
-                style={{ position: 'relative', zIndex: 10000 }}
               >
                 <User size={16} strokeWidth={1.4} />
                 <span className="hidden sm:inline">{session.user?.name?.split(" ")[0] || "Account"}</span>
               </button>
 
               {menuOpen && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: '100%',
-                    marginTop: '8px',
-                    width: '224px',
-                    background: '#FAF7F2',
-                    border: '1px solid #E5E0D8',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    zIndex: 99999,
-                    padding: '8px 0',
-                  }}
-                >
-                  <div style={{ padding: '8px 16px', borderBottom: '1px solid #E5E0D8' }}>
-                    <p style={{ fontSize: '14px', color: '#1a1a1a' }}>
-                      {session.user?.email}
-                    </p>
-                  </div>
-                  {isAdmin && (
-                    <a
-                      href="/admin"
-                      onClick={() => setMenuOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '12px', color: '#1a1a1a', textDecoration: 'none' }}
-                    >
-                      <LayoutDashboard size={14} />
-                      Admin
-                    </a>
-                  )}
-                  <form action="/api/auth/signout" method="POST">
-                    <input type="hidden" name="callbackUrl" value="/" />
+                <>
+                  {/* Backdrop to capture outside clicks */}
+                  <div
+                    className="fixed inset-0"
+                    style={{ zIndex: 9998 }}
+                    onClick={() => setMenuOpen(false)}
+                  />
+                  <div
+                    className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-1"
+                    style={{ zIndex: 9999 }}
+                  >
+                    <div className="px-4 py-3 border-b border-border">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {session.user?.email}
+                      </p>
+                    </div>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition"
+                      >
+                        <LayoutDashboard size={14} />
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button
-                      type="submit"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        width: '100%',
-                        padding: '8px 16px',
-                        fontSize: '12px',
-                        color: '#666',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                      }}
+                      type="button"
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-xs text-muted-foreground hover:text-red-600 hover:bg-cream transition text-left"
                     >
                       <LogOut size={14} />
                       {language === "en" ? "Sign Out" : "登出"}
                     </button>
-                  </form>
-                </div>
+                  </div>
+                </>
               )}
             </div>
           ) : (

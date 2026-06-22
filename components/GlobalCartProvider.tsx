@@ -20,6 +20,7 @@ export function useCartSidebar() {
 
 export function GlobalCartProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
   const toggleCart = () => setIsOpen(!isOpen);
@@ -27,7 +28,7 @@ export function GlobalCartProvider({ children }: { children: ReactNode }) {
   return (
     <CartSidebarContext.Provider value={{ isOpen, openCart, closeCart, toggleCart }}>
       {children}
-      <CartSidebar isOpen={isOpen} onClose={closeCart} />
+      {isOpen && <CartSidebar isOpen={isOpen} onClose={closeCart} />}
     </CartSidebarContext.Provider>
   );
 }

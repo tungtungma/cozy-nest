@@ -18,7 +18,7 @@ export default function AdminNav() {
       langToggle: "繁中",
     },
     zh: {
-      title: "Cozy Nest — 管理後台",
+      title: "Cozy Nest — 管理",
       overview: "儀表板",
       products: "產品",
       orders: "訂單",
@@ -39,58 +39,40 @@ export default function AdminNav() {
   ];
 
   return (
-    <nav className="border-b border-border bg-background sticky top-0 z-40">
-      <div className="mx-auto max-w-7xl px-4 md:px-8 py-3 md:py-4">
-        {/* Top row: title centered on mobile, links + actions below */}
-        <div className="flex items-center justify-between md:hidden">
-          <div className="flex gap-2 overflow-x-auto">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="px-2 py-1 text-[10px] whitespace-nowrap tracking-wider uppercase text-muted-foreground hover:text-foreground hover:bg-cream rounded transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
+    <nav className="border-b border-border bg-background sticky top-0" style={{ zIndex: 90 }}>
+      <div className="mx-auto max-w-7xl px-4 md:px-8 py-3 md:py-4 flex items-center justify-between">
+        {/* Left: title */}
+        <Link href="/admin" className="font-serif text-lg md:text-xl text-foreground tracking-tight">
+          {t.title}
+        </Link>
+
+        {/* Center: nav links */}
+        <div className="flex gap-1">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="px-3 py-1.5 text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:bg-cream rounded transition-colors"
+            >
+              {l.label}
+            </Link>
+          ))}
         </div>
 
-        {/* Desktop: 3-column layout */}
-        <div className="hidden md:flex items-center justify-between">
-          {/* Left: navigation links */}
-          <div className="flex gap-1 w-1/3">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="px-3 py-1.5 text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:bg-cream rounded transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Center: title */}
-          <Link href="/admin" className="font-serif text-xl text-foreground tracking-tight text-center w-1/3">
-            {t.title}
+        {/* Right: actions */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleLanguage}
+            className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-foreground transition"
+          >
+            {t.langToggle}
+          </button>
+          <Link
+            href="/"
+            className="text-xs tracking-wider text-muted-foreground hover:text-foreground transition"
+          >
+            {t.backToSite}
           </Link>
-
-          {/* Right: actions */}
-          <div className="flex items-center gap-3 w-1/3 justify-end">
-            <button
-              onClick={toggleLanguage}
-              className="text-[10px] tracking-wider uppercase text-muted-foreground hover:text-foreground transition"
-            >
-              {t.langToggle}
-            </button>
-            <Link
-              href="/"
-              className="text-xs tracking-wider text-muted-foreground hover:text-foreground transition"
-            >
-              {t.backToSite}
-            </Link>
-          </div>
         </div>
       </div>
     </nav>

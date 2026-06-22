@@ -199,16 +199,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-2">{t[language].note}</label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white border border-border rounded-lg text-sm focus:border-accent outline-none transition resize-none"
-                />
-              </div>
             </div>
 
             <div className="lg:col-span-2">
@@ -239,7 +229,6 @@ export default function CheckoutPage() {
                     onChange={(e) => setNote(e.target.value)}
                     rows={2}
                     className="w-full px-4 py-3 bg-white border border-border rounded-lg text-sm focus:border-accent outline-none transition resize-none"
-                    placeholder={language === "en" ? "Special instructions..." : "特別指示..."}
                   />
                 </div>
 

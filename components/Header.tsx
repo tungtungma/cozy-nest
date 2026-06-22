@@ -3,14 +3,14 @@
 import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/store/useCart";
 import { useCartSidebar } from "@/components/GlobalCartProvider";
 import { useMemberStatus } from "@/hooks/useMemberStatus";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Header() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { getTotalItems } = useCart();
   const { openCart } = useCartSidebar();
   const { isAdmin } = useMemberStatus();
@@ -18,6 +18,7 @@ export function Header() {
   const cartCount = getTotalItems();
   const [menuOpen, setMenuOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -25,16 +26,17 @@ export function Header() {
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('[data-user-menu]')) setMenuOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
     };
-    document.addEventListener('click', handler);
-    return () => document.removeEventListener('click', handler);
+    // Use mousedown to capture before other click handlers
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
   const handleSignOut = () => {
     setMenuOpen(false);
-    // Use direct POST form to ensure sign out works
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/api/auth/signout';
@@ -51,21 +53,17 @@ export function Header() {
   return (
     <header className="w-full border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-8 py-4 md:py-6">
-        {/* Left Nav */}
         <nav className="hidden sm:flex items-center gap-6 md:gap-10 text-[10px] md:text-xs tracking-[0.22em] uppercase text-foreground/80">
           <Link href="/products" className="hover:text-accent transition">{nav[language].cosmetics}</Link>
           <Link href="/about" className="hover:text-accent transition">{nav[language].about}</Link>
         </nav>
 
-        {/* Center Logo */}
         <Link href="/" className="flex flex-col items-center leading-none">
           <span className="font-serif text-2xl md:text-3xl tracking-tight">cozy nest</span>
           <span className="mt-1 text-[8px] md:text-[9px] tracking-[0.3em] text-muted-foreground">COZY NEST</span>
         </Link>
 
-        {/* Right Actions */}
         <div className="flex items-center gap-3 md:gap-6 text-foreground/70">
-          {/* Language Switcher */}
           <button
             onClick={toggleLanguage}
             className="text-[9px] md:text-[10px] tracking-wider uppercase text-muted-foreground hover:text-foreground transition px-2 py-1"
@@ -74,7 +72,7 @@ export function Header() {
           </button>
 
           {mounted && session ? (
-            <div className="relative" data-user-menu>
+            <div ref={menuRef} className="relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-1 md:gap-2 text-[10px] tracking-wider uppercase hover:text-accent transition"
@@ -84,18 +82,26 @@ export function Header() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-20">
+                <div className="absolute right-0 mt-2 w-56 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
                   <div className="px-4 py-3 border-b border-border">
-                    <p className="text-sm font-medium text-foreground truncate">{session.user?.email}</p>
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {session.user?.email}
+                    </p>
                   </div>
                   {isAdmin && (
-                    <Link href="/admin" onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition">
-                      <LayoutDashboard size={14} />Admin
+                    <Link
+                      href="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-cream transition cursor-pointer"
+                    >
+                      <LayoutDashboard size={14} />
+                      Admin
                     </Link>
                   )}
-                  <button onClick={handleSignOut}
-                    className="flex items-center gap-2 w-full px-4 py-2 text-xs text-red-600 hover:bg-cream transition">
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-xs text-muted-foreground hover:text-red-600 hover:bg-cream transition cursor-pointer"
+                  >
                     <LogOut size={14} />
                     {language === "en" ? "Sign Out" : "登出"}
                   </button>

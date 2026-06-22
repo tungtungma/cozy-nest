@@ -230,6 +230,19 @@ export default function CheckoutPage() {
                   <div className="flex justify-between"><span className="text-muted-foreground">{t[language].delivery}</span><span>{deliveryFee === 0 ? t[language].free : `HK$${deliveryFee}`}</span></div>
                   <div className="flex justify-between font-serif text-lg md:text-xl pt-2 border-t border-border mt-2"><span>{t[language].total}</span><span className="text-accent">HK${total.toLocaleString()}</span></div>
                 </div>
+
+                {/* Order Note */}
+                <div className="mt-6">
+                  <label className="block text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-2">{t[language].note}</label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={2}
+                    className="w-full px-4 py-3 bg-white border border-border rounded-lg text-sm focus:border-accent outline-none transition resize-none"
+                    placeholder={language === "en" ? "Special instructions..." : "特別指示..."}
+                  />
+                </div>
+
                 {error && <p className="text-red-500 text-xs mt-4 bg-red-50 p-3 rounded-lg">{error}</p>}
                 <button type="submit" disabled={submitting} className="btn-pill-dark w-full mt-4 md:mt-6 disabled:opacity-50">
                   {submitting ? t[language].placing : t[language].place}

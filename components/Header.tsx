@@ -2,7 +2,7 @@
 
 import { User, ShoppingBag, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/store/useCart";
 import { useCartSidebar } from "@/components/GlobalCartProvider";
@@ -34,7 +34,13 @@ export function Header() {
 
   const handleSignOut = () => {
     setMenuOpen(false);
-    signOut({ callbackUrl: "/" });
+    // Use direct POST form to ensure sign out works
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/auth/signout';
+    form.innerHTML = '<input type="hidden" name="callbackUrl" value="/" />';
+    document.body.appendChild(form);
+    form.submit();
   };
 
   const nav = {
